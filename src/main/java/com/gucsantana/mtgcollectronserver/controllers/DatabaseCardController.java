@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.gucsantana.mtgcollectronserver.models.DatabaseCard;
 import com.gucsantana.mtgcollectronserver.repos.DatabaseCardRepository;
@@ -21,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -63,33 +65,34 @@ public class DatabaseCardController {
         return dbCardRepo.findBySetCodeAndCardNameAndCollectorNumber(setCode,cardName,collectorNumber);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     @Transactional
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns a single DatabaseCard by ID")
-    public DatabaseCard getUser(@Parameter(description = "Card ID") @PathVariable int id){
+    public DatabaseCard getDatabaseCardById(@Parameter(description = "Card ID") @PathVariable int id){
         LOGGER.info("Finding database card by Id: "+id);
-        return dbCardRepo.findById(id).get();
+        return dbCardRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Database card not found with id: " + id));
     }
     
     @PostMapping("/")
     @Operation (summary = "Creates a database card object by passing in a pre-filled DatabaseCard instance")
-    public DatabaseCard createUser(@Valid @RequestBody DatabaseCard dbCard){
+    public DatabaseCard createDatabaseCard(@Valid @RequestBody DatabaseCard dbCard){
         LOGGER.info("Created database card: "+ dbCard.getCardName() + " on set " + dbCard.getSetCode() + " with collector number " + dbCard.getCollectorNumber());
         return dbCardRepo.save(dbCard);
     }
 
     @PutMapping("/")
     @Operation (summary = "Updates a database card object by passing in a pre-filled DatabaseCard instance; uses ID to match")
-    public DatabaseCard updateUser(@RequestBody DatabaseCard dbCard){
+    public DatabaseCard updateDatabaseCard(@RequestBody DatabaseCard dbCard){
         LOGGER.info("Updated database card: "+ dbCard.getCardName() + " on set " + dbCard.getSetCode() + " with collector number " + dbCard.getCollectorNumber());
         return dbCardRepo.save(dbCard);
     }
 
-    @DeleteMapping("/{id}")
-    @CacheEvict (value = "user-cache")
+    @DeleteMapping("/id/{id}")
+    @CacheEvict (value = "db-card-cache")
     @Operation (summary = "Deletes a database card by passing its ID")
-    public void deleteUser(@PathVariable int id){
+    public void deleteDatabaseCard(@PathVariable int id){
         dbCardRepo.deleteById(id);
     }
 }
