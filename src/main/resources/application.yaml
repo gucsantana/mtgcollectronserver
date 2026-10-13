@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: mtgcollectronserver
+  datasource:
+    url: jdbc:mysql://localhost:3306/mtg_collectron
+    username: admin
+    password: 
+  jpa:
+    show-sql: true
+
+server:
+  servlet:
+    context-path: /mtg-collectron
+
+# mtgcollectronserver:
+#   services:
+#     url: http://localhost:8080/mtg-collectron/card/
+
+logging:
+  file:
+    name: logs/application.log
+  level:
+    root: debug
+
+# management:
+#   endpoint:
+#     health:
+#       show-details: always
+#   endpoints:
+#     web:
+#       exposure:
+#         include: "*"
+#   info:
+#     env:
+#       enabled: true
