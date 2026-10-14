@@ -52,7 +52,8 @@ public class DatabaseSetController {
     @CacheEvict(value = "db-set-cache", allEntries = true)
     @Operation(summary = "Creates a database set")
     public DatabaseSet createSet(@Valid @RequestBody DatabaseSet databaseSet) {
-        return databaseSetRepository.save(databaseSet);
+        return databaseSetRepository.findById(databaseSet.getCode())
+                .orElseGet(() -> databaseSetRepository.save(databaseSet));
     }
 
     @PutMapping("/{setCode}")
@@ -65,7 +66,7 @@ public class DatabaseSetController {
                     "Database set not found with code: " + setCode);
         }
 
-        databaseSet.setSetCode(setCode);
+        databaseSet.setCode(setCode);
         return databaseSetRepository.save(databaseSet);
     }
 

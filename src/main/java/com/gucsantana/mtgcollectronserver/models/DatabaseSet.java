@@ -15,12 +15,12 @@ public class DatabaseSet implements Serializable {
 
     @Id
     @NotNull
-    @Column(name = "set_code", length = 10, nullable = false)
-    private String setCode;
+    @Column(name = "code", length = 10, nullable = false)
+    private String code;
 
     @NotNull
-    @Column(name = "set_name", length = 100, nullable = false)
-    private String setName;
+    @Column(name = "name", length = 100, nullable = false)
+    private String name;
 
     @NotNull
     @Column(name = "released_at", nullable = false)
@@ -49,20 +49,20 @@ public class DatabaseSet implements Serializable {
     @Column(name = "icon_svg_uri", length = 100)
     private String iconSvgUri;
 
-    public String getSetCode() {
-        return setCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setSetCode(String set_code) {
-        this.setCode = set_code;
+    public void setCode(String set_code) {
+        this.code = set_code;
     }
 
-    public String getSetName() {
-        return setName;
+    public String getName() {
+        return name;
     }
 
-    public void setSetName(String set_name) {
-        this.setName = set_name;
+    public void setName(String set_name) {
+        this.name = set_name;
     }
 
     public LocalDateTime getReleasedAt() {

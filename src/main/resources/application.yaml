@@ -9,6 +9,8 @@ spring:
     show-sql: true
 
 server:
+  port: 8080
+  # address: https://google.com 
   servlet:
     context-path: /mtg-collectron
 
@@ -20,7 +22,7 @@ logging:
   file:
     name: logs/application.log
   level:
-    root: debug
+    root: error
 
 # management:
 #   endpoint:

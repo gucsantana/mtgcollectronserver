@@ -7,8 +7,8 @@ import com.gucsantana.mtgcollectronserver.models.DatabaseCard;
 import java.util.List;
 
 
-public interface DatabaseCardRepository extends JpaRepository<DatabaseCard,Integer>{
-    List<DatabaseCard> findBySetCode(String setCode);
-    List<DatabaseCard> findBySetCodeAndCardName(String setCode, String cardName);
-    List<DatabaseCard> findBySetCodeAndCardNameAndCollectorNumber(String setCode, String cardName, String collector_number);
+public interface DatabaseCardRepository extends JpaRepository<DatabaseCard,String>{
+    List<DatabaseCard> findBySetCode(String set);
+    List<DatabaseCard> findBySetCodeAndName(String set, String name);
+    List<DatabaseCard> findBySetCodeAndNameAndCollectorNumber(String set, String name, String collector_number);
 }

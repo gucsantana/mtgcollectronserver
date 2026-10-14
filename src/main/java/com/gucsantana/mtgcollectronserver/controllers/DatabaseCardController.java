@@ -38,61 +38,65 @@ public class DatabaseCardController {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(DatabaseCardController.class);
 
-    @GetMapping("/")
-    @Hidden // not visible on Swagger
-    public List<DatabaseCard> getAllCards(){
-        return dbCardRepo.findAll();
-    }
-
     @GetMapping("/{setCode}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all database cards for a single set")
-    public List<DatabaseCard> getAllCardsBySet(@Parameter(description = "Set Code") @PathVariable String setCode){
-        return dbCardRepo.findBySetCode(setCode);
+    public List<DatabaseCard> getAllCardsBySet(@Parameter(description = "Set Code") @PathVariable String set){
+        return dbCardRepo.findBySetCode(set);
     }
 
     @GetMapping("/{setCode}/{cardName}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all cards of a given name in a single set")
-    public List<DatabaseCard> getAllCardsOfNameInSet(@Parameter(description = "Set Code") @PathVariable String setCode, @Parameter(description = "CardName") @PathVariable String cardName){
-        return dbCardRepo.findBySetCodeAndCardName(setCode,cardName);
+    public List<DatabaseCard> getAllCardsOfNameInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name){
+        return dbCardRepo.findBySetCodeAndName(set,name);
     }
 
     @GetMapping("/{setCode}/{cardName}/{collectorNumber}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns a specific version of a card in a single set")
-    public List<DatabaseCard> getSpecificVersionOfCardInSet(@Parameter(description = "Set Code") @PathVariable String setCode, @Parameter(description = "CardName") @PathVariable String cardName, @Parameter(description = "collectorNumber") @PathVariable String collectorNumber){
-        return dbCardRepo.findBySetCodeAndCardNameAndCollectorNumber(setCode,cardName,collectorNumber);
+    public List<DatabaseCard> getSpecificVersionOfCardInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name, @Parameter(description = "collectorNumber") @PathVariable String collectorNumber){
+        return dbCardRepo.findBySetCodeAndNameAndCollectorNumber(set,name,collectorNumber);
     }
 
     @GetMapping("/id/{id}")
     @Transactional
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns a single DatabaseCard by ID")
-    public DatabaseCard getDatabaseCardById(@Parameter(description = "Card ID") @PathVariable int id){
+    public DatabaseCard getDatabaseCardById(@Parameter(description = "Card ID") @PathVariable String id){
         LOGGER.info("Finding database card by Id: "+id);
         return dbCardRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Database card not found with id: " + id));
     }
     
     @PostMapping("/")
+    @CacheEvict(value = "db-card-cache", allEntries = true)
     @Operation (summary = "Creates a database card object by passing in a pre-filled DatabaseCard instance")
-    public DatabaseCard createDatabaseCard(@Valid @RequestBody DatabaseCard dbCard){
-        LOGGER.info("Created database card: "+ dbCard.getCardName() + " on set " + dbCard.getSetCode() + " with collector number " + dbCard.getCollectorNumber());
-        return dbCardRepo.save(dbCard);
-    }
+    public DatabaseCard createOrUpdateDatabaseCard(@Valid @RequestBody DatabaseCard dbCard){
+        if (dbCard.getId() != null) {
+            DatabaseCard existingCard = dbCardRepo.findById(dbCard.getId()).orElse(null);
+            if (existingCard != null) {
+                LOGGER.info("Updating existing database card with ID: " + dbCard.getId());
+                existingCard.setSetCode(dbCard.getSetCode());
+                existingCard.setName(dbCard.getName());
+                existingCard.setCollectorNumber(dbCard.getCollectorNumber());
+                existingCard.setRarity(dbCard.getRarity());
+                existingCard.setPrices(dbCard.getPrices());
+                existingCard.setImageUris(dbCard.getImageUris());
+                existingCard.setPromoTypes(dbCard.getPromoTypes());
+                return dbCardRepo.save(existingCard);
+            }
+        }
 
-    @PutMapping("/")
-    @Operation (summary = "Updates a database card object by passing in a pre-filled DatabaseCard instance; uses ID to match")
-    public DatabaseCard updateDatabaseCard(@RequestBody DatabaseCard dbCard){
-        LOGGER.info("Updated database card: "+ dbCard.getCardName() + " on set " + dbCard.getSetCode() + " with collector number " + dbCard.getCollectorNumber());
+        LOGGER.info("Creating database card: " + dbCard.getName() + " on set " + dbCard.getSetCode()
+                + " with collector number " + dbCard.getCollectorNumber());
         return dbCardRepo.save(dbCard);
     }
 
     @DeleteMapping("/id/{id}")
     @CacheEvict (value = "db-card-cache")
     @Operation (summary = "Deletes a database card by passing its ID")
-    public void deleteDatabaseCard(@PathVariable int id){
+    public void deleteDatabaseCard(@PathVariable String id){
         dbCardRepo.deleteById(id);
     }
 }

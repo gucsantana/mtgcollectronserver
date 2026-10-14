@@ -1,11 +1,11 @@
 package com.gucsantana.mtgcollectronserver.models;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -13,43 +13,48 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity 
 @Table(name = "cards")
 public class DatabaseCard implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @NotNull 
+    private String id;
 
     @NotNull 
     @Column(name="set_code")
+    @JsonProperty("set_code")
     private String setCode;
     @NotNull 
-    @Column(name="card_name")
-    private String cardName;
+    private String name;
     @NotNull 
     @Column(name="collector_number")
+    @JsonProperty("collector_number")
     private String collectorNumber;
     @NotNull 
     private String rarity;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
-    private String prices;
+    private Map<String, Object> prices;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name="image_uris", columnDefinition = "json")
-    private String imageUris;
+    @JsonProperty("image_uris")
+    private Map<String, String> imageUris;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name="promo_types", columnDefinition = "json")
-    private String promoTypes;
+    @JsonProperty("promo_types")
+    private List<String> promoTypes;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -61,12 +66,12 @@ public class DatabaseCard implements Serializable {
         this.setCode = set_code;
     }
 
-    public String getCardName() {
-        return cardName;
+    public String getName() {
+        return name;
     }
 
-    public void setCardName(String card_name) {
-        this.cardName = card_name;
+    public void setName(String card_name) {
+        this.name = card_name;
     }
 
     public String getCollectorNumber() {
@@ -85,27 +90,27 @@ public class DatabaseCard implements Serializable {
         this.rarity = rarity;
     }
 
-    public String getPrices() {
+    public Map<String, Object> getPrices() {
         return prices;
     }
 
-    public void setPrices(String prices) {
+    public void setPrices(Map<String, Object> prices) {
         this.prices = prices;
     }
 
-    public String getImageUris() {
+    public Map<String, String> getImageUris() {
         return imageUris;
     }
 
-    public void setImageUris(String image_uris) {
+    public void setImageUris(Map<String, String> image_uris) {
         this.imageUris = image_uris;
     }
 
-    public String getPromoTypes() {
+    public List<String> getPromoTypes() {
         return promoTypes;
     }
 
-    public void setPromoTypes(String promo_types) {
+    public void setPromoTypes(List<String> promo_types) {
         this.promoTypes = promo_types;
     }
 }
