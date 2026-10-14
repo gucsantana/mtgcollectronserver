@@ -56,10 +56,15 @@ public class UserSetInfo implements Serializable {
     private Float fullSetOneEach;
 
     public static class UserSetInfoId implements Serializable {
-        private Long card_owner_id;
-        private String set_code;
+        private Long cardOwnerId;
+        private String setCode;
 
         public UserSetInfoId() {
+        }
+
+        public UserSetInfoId(Long cardOwnerId, String setCode) {
+            this.cardOwnerId = cardOwnerId;
+            this.setCode = setCode;
         }
 
         @Override
@@ -70,13 +75,13 @@ public class UserSetInfo implements Serializable {
             if (!(object instanceof UserSetInfoId that)) {
                 return false;
             }
-            return Objects.equals(card_owner_id, that.card_owner_id)
-                    && Objects.equals(set_code, that.set_code);
+            return Objects.equals(cardOwnerId, that.cardOwnerId)
+                    && Objects.equals(setCode, that.setCode);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(card_owner_id, set_code);
+            return Objects.hash(cardOwnerId, setCode);
         }
     }
 
