@@ -16,23 +16,23 @@ public class DatabaseSet implements Serializable {
     @Id
     @NotNull
     @Column(name = "set_code", length = 10, nullable = false)
-    private String set_code;
+    private String setCode;
 
     @NotNull
     @Column(name = "set_name", length = 100, nullable = false)
-    private String set_name;
+    private String setName;
 
     @NotNull
     @Column(name = "released_at", nullable = false)
-    private LocalDateTime released_at;
+    private LocalDateTime releasedAt;
 
     @NotNull
     @Column(name = "set_type", length = 20, nullable = false)
-    private String set_type;
+    private String setType;
 
     @NotNull
     @Column(name = "card_count", nullable = false)
-    private Integer card_count;
+    private Integer cardCount;
 
     @NotNull
     @Column(name = "digital", nullable = false)
@@ -40,53 +40,53 @@ public class DatabaseSet implements Serializable {
 
     @NotNull
     @Column(name = "nonfoil_only", nullable = false)
-    private Boolean nonfoil_only;
+    private Boolean nonfoilOnly;
 
     @NotNull
     @Column(name = "foil_only", nullable = false)
-    private Boolean foil_only;
+    private Boolean foilOnly;
 
     @Column(name = "icon_svg_uri", length = 100)
-    private String icon_svg_uri;
+    private String iconSvgUri;
 
-    public String getSet_code() {
-        return set_code;
+    public String getSetCode() {
+        return setCode;
     }
 
-    public void setSet_code(String set_code) {
-        this.set_code = set_code;
+    public void setSetCode(String set_code) {
+        this.setCode = set_code;
     }
 
-    public String getSet_name() {
-        return set_name;
+    public String getSetName() {
+        return setName;
     }
 
-    public void setSet_name(String set_name) {
-        this.set_name = set_name;
+    public void setSetName(String set_name) {
+        this.setName = set_name;
     }
 
-    public LocalDateTime getReleased_at() {
-        return released_at;
+    public LocalDateTime getReleasedAt() {
+        return releasedAt;
     }
 
-    public void setReleased_at(LocalDateTime released_at) {
-        this.released_at = released_at;
+    public void setReleasedAt(LocalDateTime released_at) {
+        this.releasedAt = released_at;
     }
 
-    public String getSet_type() {
-        return set_type;
+    public String getSetType() {
+        return setType;
     }
 
-    public void setSet_type(String set_type) {
-        this.set_type = set_type;
+    public void setSetType(String set_type) {
+        this.setType = set_type;
     }
 
-    public Integer getCard_count() {
-        return card_count;
+    public Integer getCardCount() {
+        return cardCount;
     }
 
-    public void setCard_count(Integer card_count) {
-        this.card_count = card_count;
+    public void setCardCount(Integer card_count) {
+        this.cardCount = card_count;
     }
 
     public Boolean getDigital() {
@@ -97,27 +97,27 @@ public class DatabaseSet implements Serializable {
         this.digital = digital;
     }
 
-    public Boolean getNonfoil_only() {
-        return nonfoil_only;
+    public Boolean getNonfoilOnly() {
+        return nonfoilOnly;
     }
 
-    public void setNonfoil_only(Boolean nonfoil_only) {
-        this.nonfoil_only = nonfoil_only;
+    public void setNonfoilOnly(Boolean nonfoil_only) {
+        this.nonfoilOnly = nonfoil_only;
     }
 
-    public Boolean getFoil_only() {
-        return foil_only;
+    public Boolean getFoilOnly() {
+        return foilOnly;
     }
 
-    public void setFoil_only(Boolean foil_only) {
-        this.foil_only = foil_only;
+    public void setFoilOnly(Boolean foil_only) {
+        this.foilOnly = foil_only;
     }
 
-    public String getIcon_svg_uri() {
-        return icon_svg_uri;
+    public String getIconSvgUri() {
+        return iconSvgUri;
     }
 
-    public void setIcon_svg_uri(String icon_svg_uri) {
-        this.icon_svg_uri = icon_svg_uri;
+    public void setIconSvgUri(String icon_svg_uri) {
+        this.iconSvgUri = icon_svg_uri;
     }
 }

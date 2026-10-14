@@ -15,70 +15,70 @@ public class UserPreferences implements Serializable {
     @Id
     @NotNull
     @Column(name = "user_id", nullable = false)
-    private Long user_id;
+    private Long userId;
 
     @NotNull
     @Column(name = "full_set_option_selected", nullable = false)
-    private Integer full_set_option_selected;
+    private Integer fullSetOptionSelected;
 
     @NotNull
     @Column(name = "card_per_page_option_selected", nullable = false)
-    private Integer card_per_page_option_selected;
+    private Integer cardPerPageOptionSelected;
 
     @Column(name = "dark_mode")
-    private Boolean dark_mode;
+    private Boolean darkMode;
 
     @Column(name = "show_prices")
-    private Boolean show_prices;
+    private Boolean showPrices;
 
     @Column(name = "show_sidebar_percent")
-    private Boolean show_sidebar_percent;
+    private Boolean showSidebarPercent;
 
-    public Long getUser_id() {
-        return user_id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long user_id) {
+        this.userId = user_id;
     }
 
-    public Integer getFull_set_option_selected() {
-        return full_set_option_selected;
+    public Integer getFullSetOptionSelected() {
+        return fullSetOptionSelected;
     }
 
-    public void setFull_set_option_selected(Integer full_set_option_selected) {
-        this.full_set_option_selected = full_set_option_selected;
+    public void setFullSetOptionSelected(Integer full_set_option_selected) {
+        this.fullSetOptionSelected = full_set_option_selected;
     }
 
-    public Integer getCard_per_page_option_selected() {
-        return card_per_page_option_selected;
+    public Integer getCardPerPageOptionSelected() {
+        return cardPerPageOptionSelected;
     }
 
-    public void setCard_per_page_option_selected(Integer card_per_page_option_selected) {
-        this.card_per_page_option_selected = card_per_page_option_selected;
+    public void setCardPerPageOptionSelected(Integer card_per_page_option_selected) {
+        this.cardPerPageOptionSelected = card_per_page_option_selected;
     }
 
-    public Boolean getDark_mode() {
-        return dark_mode;
+    public Boolean getDarkMode() {
+        return darkMode;
     }
 
-    public void setDark_mode(Boolean dark_mode) {
-        this.dark_mode = dark_mode;
+    public void setDarkMode(Boolean dark_mode) {
+        this.darkMode = dark_mode;
     }
 
-    public Boolean getShow_prices() {
-        return show_prices;
+    public Boolean getShowPrices() {
+        return showPrices;
     }
 
-    public void setShow_prices(Boolean show_prices) {
-        this.show_prices = show_prices;
+    public void setShowPrices(Boolean show_prices) {
+        this.showPrices = show_prices;
     }
 
-    public Boolean getShow_sidebar_percent() {
-        return show_sidebar_percent;
+    public Boolean getShowSidebarPercent() {
+        return showSidebarPercent;
     }
 
-    public void setShow_sidebar_percent(Boolean show_sidebar_percent) {
-        this.show_sidebar_percent = show_sidebar_percent;
+    public void setShowSidebarPercent(Boolean show_sidebar_percent) {
+        this.showSidebarPercent = show_sidebar_percent;
     }
 }

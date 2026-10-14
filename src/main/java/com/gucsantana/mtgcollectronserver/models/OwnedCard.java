@@ -18,44 +18,48 @@ public class OwnedCard implements Serializable {
     @Id
     @NotNull
     @Column(name = "card_owner_id", nullable = false)
-    private Long card_owner_id;
+    private Long cardOwnerId;
 
     @Id
     @NotNull
     @Column(name = "set_code", length = 10, nullable = false)
-    private String set_code;
+    private String setCode;
+
+    @NotNull
+    @Column(name = "card_name", length = 100, nullable = false)
+    private String cardName;
 
     @Id
     @NotNull
     @Column(name = "collector_number", length = 7, nullable = false)
-    private String collector_number;
+    private String collectorNumber;
 
     @Column(name = "card_count")
-    private Integer card_count;
+    private Integer cardCount;
 
     @NotNull
     @Column(name = "is_foil", nullable = false)
-    private Boolean is_foil;
+    private Boolean isFoil;
 
     @Column(name = "is_considered_extra")
-    private Boolean is_considered_extra;
+    private Boolean isConsideredExtra;
 
     @Column(name = "is_tagged_square")
-    private Boolean is_tagged_square;
+    private Boolean isTaggedSquare;
 
     @Column(name = "is_tagged_circle")
-    private Boolean is_tagged_circle;
+    private Boolean isTaggedCircle;
 
     @Column(name = "is_tagged_triangle")
-    private Boolean is_tagged_triangle;
+    private Boolean isTaggedTriangle;
 
     @Column(name = "is_tagged_cross")
-    private Boolean is_tagged_cross;
+    private Boolean isTaggedCross;
 
     public static class OwnedCardId implements Serializable {
-        private Long card_owner_id;
-        private String set_code;
-        private String collector_number;
+        private Long cardOwnerId;
+        private String setCode;
+        private String collectorNumber;
 
         public OwnedCardId() {
         }
@@ -68,94 +72,102 @@ public class OwnedCard implements Serializable {
             if (!(object instanceof OwnedCardId that)) {
                 return false;
             }
-            return Objects.equals(card_owner_id, that.card_owner_id)
-                    && Objects.equals(set_code, that.set_code)
-                    && Objects.equals(collector_number, that.collector_number);
+            return Objects.equals(cardOwnerId, that.cardOwnerId)
+                    && Objects.equals(setCode, that.setCode)
+                    && Objects.equals(collectorNumber, that.collectorNumber);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(card_owner_id, set_code, collector_number);
+            return Objects.hash(cardOwnerId, setCode, collectorNumber);
         }
     }
 
-    public Long getCard_owner_id() {
-        return card_owner_id;
+    public Long getCardOwnerId() {
+        return cardOwnerId;
     }
 
-    public void setCard_owner_id(Long card_owner_id) {
-        this.card_owner_id = card_owner_id;
+    public void setCardOwnerId(Long card_owner_id) {
+        this.cardOwnerId = card_owner_id;
     }
 
-    public String getSet_code() {
-        return set_code;
+    public String getSetCode() {
+        return setCode;
     }
 
-    public void setSet_code(String set_code) {
-        this.set_code = set_code;
+    public void setSetCode(String set_code) {
+        this.setCode = set_code;
     }
 
-    public String getCollector_number() {
-        return collector_number;
+    public String getCardName() {
+        return cardName;
     }
 
-    public void setCollector_number(String collector_number) {
-        this.collector_number = collector_number;
+    public void setCardName(String card_name) {
+        this.cardName = card_name;
     }
 
-    public Integer getCard_count() {
-        return card_count;
+    public String getCollectorNumber() {
+        return collectorNumber;
     }
 
-    public void setCard_count(Integer card_count) {
-        this.card_count = card_count;
+    public void setCollectorNumber(String collector_number) {
+        this.collectorNumber = collector_number;
     }
 
-    public Boolean getIs_foil() {
-        return is_foil;
+    public Integer getCardCount() {
+        return cardCount;
     }
 
-    public void setIs_foil(Boolean is_foil) {
-        this.is_foil = is_foil;
+    public void setCardCount(Integer card_count) {
+        this.cardCount = card_count;
     }
 
-    public Boolean getIs_considered_extra() {
-        return is_considered_extra;
+    public Boolean getIsFoil() {
+        return isFoil;
     }
 
-    public void setIs_considered_extra(Boolean is_considered_extra) {
-        this.is_considered_extra = is_considered_extra;
+    public void setIsFoil(Boolean is_foil) {
+        this.isFoil = is_foil;
     }
 
-    public Boolean getIs_tagged_square() {
-        return is_tagged_square;
+    public Boolean getIsConsideredExtra() {
+        return isConsideredExtra;
     }
 
-    public void setIs_tagged_square(Boolean is_tagged_square) {
-        this.is_tagged_square = is_tagged_square;
+    public void setIsConsideredExtra(Boolean is_considered_extra) {
+        this.isConsideredExtra = is_considered_extra;
     }
 
-    public Boolean getIs_tagged_circle() {
-        return is_tagged_circle;
+    public Boolean getIsTaggedSquare() {
+        return isTaggedSquare;
     }
 
-    public void setIs_tagged_circle(Boolean is_tagged_circle) {
-        this.is_tagged_circle = is_tagged_circle;
+    public void setIsTaggedSquare(Boolean is_tagged_square) {
+        this.isTaggedSquare = is_tagged_square;
     }
 
-    public Boolean getIs_tagged_triangle() {
-        return is_tagged_triangle;
+    public Boolean getIsTaggedCircle() {
+        return isTaggedCircle;
     }
 
-    public void setIs_tagged_triangle(Boolean is_tagged_triangle) {
-        this.is_tagged_triangle = is_tagged_triangle;
+    public void setIsTaggedCircle(Boolean is_tagged_circle) {
+        this.isTaggedCircle = is_tagged_circle;
     }
 
-    public Boolean getIs_tagged_cross() {
-        return is_tagged_cross;
+    public Boolean getIsTaggedTriangle() {
+        return isTaggedTriangle;
     }
 
-    public void setIs_tagged_cross(Boolean is_tagged_cross) {
-        this.is_tagged_cross = is_tagged_cross;
+    public void setIsTaggedTriangle(Boolean is_tagged_triangle) {
+        this.isTaggedTriangle = is_tagged_triangle;
+    }
+
+    public Boolean getIsTaggedCross() {
+        return isTaggedCross;
+    }
+
+    public void setIsTaggedCross(Boolean is_tagged_cross) {
+        this.isTaggedCross = is_tagged_cross;
     }
 }

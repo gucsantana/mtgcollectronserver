@@ -30,29 +30,29 @@ public class User implements Serializable {
 
     @NotNull
     @Column(name = "password_hash", length = 255, nullable = false)
-    private String password_hash;
+    private String passwordHash;
 
     @NotNull
     @Column(name = "username", length = 100, nullable = false)
     private String username;
 
     @Column(name = "email_verified_at")
-    private LocalDateTime email_verified_at;
+    private LocalDateTime emailVerifiedAt;
 
     @NotNull
     @Column(name = "is_active", nullable = false)
-    private Boolean is_active = true;
+    private Boolean isActive = true;
 
     @Column(name = "last_login_at")
-    private LocalDateTime last_login_at;
+    private LocalDateTime lastLoginAt;
 
     @NotNull
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @NotNull
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -70,12 +70,12 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getPassword_hash() {
-        return password_hash;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword_hash(String password_hash) {
-        this.password_hash = password_hash;
+    public void setPasswordHash(String password_hash) {
+        this.passwordHash = password_hash;
     }
 
     public String getUsername() {
@@ -86,43 +86,43 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public LocalDateTime getEmail_verified_at() {
-        return email_verified_at;
+    public LocalDateTime getEmailVerifiedAt() {
+        return emailVerifiedAt;
     }
 
-    public void setEmail_verified_at(LocalDateTime email_verified_at) {
-        this.email_verified_at = email_verified_at;
+    public void setEmailVerifiedAt(LocalDateTime email_verified_at) {
+        this.emailVerifiedAt = email_verified_at;
     }
 
-    public Boolean getIs_active() {
-        return is_active;
+    public Boolean getIsActive() {
+        return isActive;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setIsActive(Boolean is_active) {
+        this.isActive = is_active;
     }
 
-    public LocalDateTime getLast_login_at() {
-        return last_login_at;
+    public LocalDateTime getLastLoginAt() {
+        return lastLoginAt;
     }
 
-    public void setLast_login_at(LocalDateTime last_login_at) {
-        this.last_login_at = last_login_at;
+    public void setLastLoginAt(LocalDateTime last_login_at) {
+        this.lastLoginAt = last_login_at;
     }
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(LocalDateTime created_at) {
+        this.createdAt = created_at;
     }
 
-    public LocalDateTime getUpdated_at() {
-        return updated_at;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdated_at(LocalDateTime updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(LocalDateTime updated_at) {
+        this.updatedAt = updated_at;
     }
 }
