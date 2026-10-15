@@ -3,6 +3,8 @@ package com.gucsantana.mtgcollectronserver.models;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,7 @@ public class User implements Serializable {
 
     @NotNull
     @Column(name = "password_hash", length = 255, nullable = false)
+    @JsonProperty("password_hash")
     private String passwordHash;
 
     @NotNull
@@ -37,21 +40,26 @@ public class User implements Serializable {
     private String username;
 
     @Column(name = "email_verified_at")
+    @JsonProperty("email_verified_at")
     private LocalDateTime emailVerifiedAt;
 
     @NotNull
     @Column(name = "is_active", nullable = false)
+    @JsonProperty("is_active")
     private Boolean isActive = true;
 
     @Column(name = "last_login_at")
+    @JsonProperty("last_login_at")
     private LocalDateTime lastLoginAt;
 
     @NotNull
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
     @NotNull
     @Column(name = "updated_at", nullable = false)
+    @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 
     public Long getId() {

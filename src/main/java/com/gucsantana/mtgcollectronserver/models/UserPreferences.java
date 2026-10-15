@@ -2,6 +2,8 @@ package com.gucsantana.mtgcollectronserver.models;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,23 +17,29 @@ public class UserPreferences implements Serializable {
     @Id
     @NotNull
     @Column(name = "user_id", nullable = false)
+    @JsonProperty("user_id")
     private Long userId;
 
     @NotNull
     @Column(name = "full_set_option_selected", nullable = false)
+    @JsonProperty("full_set_option_selected")
     private Integer fullSetOptionSelected;
 
     @NotNull
     @Column(name = "card_per_page_option_selected", nullable = false)
+    @JsonProperty("card_per_page_option_selected")
     private Integer cardPerPageOptionSelected;
 
     @Column(name = "dark_mode")
+    @JsonProperty("dark_mode")
     private Boolean darkMode;
 
     @Column(name = "show_prices")
+    @JsonProperty("show_prices")
     private Boolean showPrices;
 
     @Column(name = "show_sidebar_percent")
+    @JsonProperty("show_sidebar_percent")
     private Boolean showSidebarPercent;
 
     public Long getUserId() {

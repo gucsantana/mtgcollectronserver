@@ -3,6 +3,8 @@ package com.gucsantana.mtgcollectronserver.models;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -18,41 +20,53 @@ public class UserSetInfo implements Serializable {
     @Id
     @NotNull
     @Column(name = "card_owner_id", nullable = false)
+    @JsonProperty("card_owner_id")
     private Long cardOwnerId;
 
     @Id
     @NotNull
     @Column(name = "set_code", length = 10, nullable = false)
+    @JsonProperty("set_code")
     private String setCode;
 
     @Column(name = "commons_count")
+    @JsonProperty("commons_count")
     private Long commonsCount;
 
     @Column(name = "uncommons_count")
+    @JsonProperty("uncommons_count")
     private Long uncommonsCount;
 
     @Column(name = "rares_count")
+    @JsonProperty("rares_count")
     private Long raresCount;
 
     @Column(name = "mythics_count")
+    @JsonProperty("mythics_count")
     private Long mythicsCount;
 
     @Column(name = "base_set_owned")
+    @JsonProperty("base_set_owned")
     private Long baseSetOwned;
 
     @Column(name = "extra_set_owned")
+    @JsonProperty("extra_set_owned")
     private Long extraSetOwned;
 
     @Column(name = "foils_owned")
+    @JsonProperty("foils_owned")
     private Long foilsOwned;
 
     @Column(name = "full_set_every_single")
+    @JsonProperty("full_set_every_single")
     private Float fullSetEverySingle;
 
     @Column(name = "full_set_base_only")
+    @JsonProperty("full_set_base_only")
     private Float fullSetBaseOnly;
 
     @Column(name = "full_set_one_each")
+    @JsonProperty("full_set_one_each")
     private Float fullSetOneEach;
 
     public static class UserSetInfoId implements Serializable {

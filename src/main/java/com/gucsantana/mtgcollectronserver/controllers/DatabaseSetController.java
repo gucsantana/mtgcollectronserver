@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,26 +47,24 @@ public class DatabaseSetController {
                         "Database set not found with code: " + setCode));
     }
 
-    @PostMapping
+    @PostMapping("/")
     @CacheEvict(value = "db-set-cache", allEntries = true)
-    @Operation(summary = "Creates a database set")
+    @Operation(summary = "Creates or updates a database set")
     public DatabaseSet createSet(@Valid @RequestBody DatabaseSet databaseSet) {
-        return databaseSetRepository.findById(databaseSet.getCode())
-                .orElseGet(() -> databaseSetRepository.save(databaseSet));
-    }
-
-    @PutMapping("/{setCode}")
-    @CacheEvict(value = "db-set-cache", allEntries = true)
-    @Operation(summary = "Updates a database set by set code")
-    public DatabaseSet updateSet(@Parameter(description = "Set code") @PathVariable String setCode,
-            @Valid @RequestBody DatabaseSet databaseSet) {
-        if (!databaseSetRepository.existsById(setCode)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Database set not found with code: " + setCode);
-        }
-
-        databaseSet.setCode(setCode);
-        return databaseSetRepository.save(databaseSet);
+        DatabaseSet setToSave = databaseSetRepository.findById(databaseSet.getCode())
+                .map(existingSet -> {
+                    existingSet.setName(databaseSet.getName());
+                    existingSet.setReleasedAt(databaseSet.getReleasedAt());
+                    existingSet.setSetType(databaseSet.getSetType());
+                    existingSet.setCardCount(databaseSet.getCardCount());
+                    existingSet.setDigital(databaseSet.getDigital());
+                    existingSet.setNonfoilOnly(databaseSet.getNonfoilOnly());
+                    existingSet.setFoilOnly(databaseSet.getFoilOnly());
+                    existingSet.setIconSvgUri(databaseSet.getIconSvgUri());
+                    return existingSet;
+                })
+                .orElse(databaseSet);
+        return databaseSetRepository.save(setToSave);
     }
 
     @DeleteMapping("/{setCode}")

@@ -46,6 +46,11 @@ public class DatabaseCard implements Serializable {
     private Map<String, String> imageUris;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name="card_faces", columnDefinition = "json")
+    @JsonProperty("card_faces")
+    private List<Map<String, Object>> cardFaces;
+
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name="promo_types", columnDefinition = "json")
     @JsonProperty("promo_types")
     private List<String> promoTypes;
@@ -104,6 +109,14 @@ public class DatabaseCard implements Serializable {
 
     public void setImageUris(Map<String, String> image_uris) {
         this.imageUris = image_uris;
+    }
+
+    public List<Map<String, Object>> getCardFaces() {
+        return cardFaces;
+    }
+
+    public void setCardFaces(List<Map<String, Object>> card_faces) {
+        this.cardFaces = card_faces;
     }
 
     public List<String> getPromoTypes() {

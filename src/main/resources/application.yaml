@@ -8,6 +8,12 @@ spring:
   jpa:
     show-sql: true
 
+scryfall:
+  import:
+    token: ${SCRYFALL_IMPORT_TOKEN}
+    batch-size: ${SCRYFALL_IMPORT_BATCH_SIZE:500}
+    user-agent: mtgcollectronserver
+
 server:
   port: 8080
   # address: https://google.com 
@@ -23,6 +29,9 @@ logging:
     name: logs/application.log
   level:
     root: error
+    org:
+      springframework:
+        web: debug    # necessary to see 400 error descriptions show up on log
 
 # management:
 #   endpoint:

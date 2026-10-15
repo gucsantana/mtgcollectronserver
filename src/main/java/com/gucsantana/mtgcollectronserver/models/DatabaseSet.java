@@ -1,7 +1,9 @@
 package com.gucsantana.mtgcollectronserver.models;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,14 +26,17 @@ public class DatabaseSet implements Serializable {
 
     @NotNull
     @Column(name = "released_at", nullable = false)
-    private LocalDateTime releasedAt;
+    @JsonProperty("released_at")    // necessary for Jackson to understand this is the value name on the json
+    private LocalDate releasedAt;
 
     @NotNull
     @Column(name = "set_type", length = 20, nullable = false)
+    @JsonProperty("set_type")
     private String setType;
 
     @NotNull
     @Column(name = "card_count", nullable = false)
+    @JsonProperty("card_count")
     private Integer cardCount;
 
     @NotNull
@@ -40,13 +45,16 @@ public class DatabaseSet implements Serializable {
 
     @NotNull
     @Column(name = "nonfoil_only", nullable = false)
+    @JsonProperty("nonfoil_only")
     private Boolean nonfoilOnly;
 
     @NotNull
     @Column(name = "foil_only", nullable = false)
+    @JsonProperty("foil_only")
     private Boolean foilOnly;
 
     @Column(name = "icon_svg_uri", length = 100)
+    @JsonProperty("icon_svg_uri")
     private String iconSvgUri;
 
     public String getCode() {
@@ -65,11 +73,11 @@ public class DatabaseSet implements Serializable {
         this.name = set_name;
     }
 
-    public LocalDateTime getReleasedAt() {
+    public LocalDate getReleasedAt() {
         return releasedAt;
     }
 
-    public void setReleasedAt(LocalDateTime released_at) {
+    public void setReleasedAt(LocalDate released_at) {
         this.releasedAt = released_at;
     }
 

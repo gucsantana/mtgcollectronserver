@@ -3,6 +3,8 @@ package com.gucsantana.mtgcollectronserver.models;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -18,42 +20,53 @@ public class OwnedCard implements Serializable {
     @Id
     @NotNull
     @Column(name = "card_owner_id", nullable = false)
+    @JsonProperty("card_owner_id")
     private Long cardOwnerId;
 
     @Id
     @NotNull
     @Column(name = "set_code", length = 10, nullable = false)
+    @JsonProperty("set_code")
     private String setCode;
 
     @NotNull
     @Column(name = "card_name", length = 100, nullable = false)
+    @JsonProperty("card_name")
     private String cardName;
 
     @Id
     @NotNull
     @Column(name = "collector_number", length = 7, nullable = false)
+    @JsonProperty("collector_number")
     private String collectorNumber;
 
     @Column(name = "card_count")
+    @JsonProperty("card_count")
     private Integer cardCount;
 
     @NotNull
     @Column(name = "is_foil", nullable = false)
+    @JsonProperty("is_foil")
     private Boolean isFoil;
 
     @Column(name = "is_considered_extra")
+    @JsonProperty("is_considered_extra")
     private Boolean isConsideredExtra;
 
     @Column(name = "is_tagged_square")
+    @JsonProperty("is_tagged_square")
     private Boolean isTaggedSquare;
 
     @Column(name = "is_tagged_circle")
+    @JsonProperty("is_tagged_circle")
     private Boolean isTaggedCircle;
 
     @Column(name = "is_tagged_triangle")
+    @JsonProperty("is_tagged_triangle")
     private Boolean isTaggedTriangle;
 
     @Column(name = "is_tagged_cross")
+    @JsonProperty("is_tagged_cross")
     private Boolean isTaggedCross;
 
     public static class OwnedCardId implements Serializable {

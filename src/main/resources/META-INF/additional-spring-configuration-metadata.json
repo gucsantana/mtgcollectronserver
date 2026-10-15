@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "scryfall.import.token",
+    "type": "java.lang.String",
+    "description": "A secret token necessary to fire the bulk data importer'"
+  },
+  {
+    "name": "scryfall.import.batch-size",
+    "type": "java.lang.String",
+    "description": "Batch size of each card import on the bulk importer"
+  },
+  {
+    "name": "scryfall.import.user-agent",
+    "type": "java.lang.String",
+    "description": "User agent string for the bulk importer"
+  }
+]}
