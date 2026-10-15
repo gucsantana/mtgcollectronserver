@@ -36,21 +36,21 @@ public class DatabaseCardController {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(DatabaseCardController.class);
 
-    @GetMapping("/{setCode}")
+    @GetMapping("/{set}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all database cards for a single set")
     public List<DatabaseCard> getAllCardsBySet(@Parameter(description = "Set Code") @PathVariable String set){
         return dbCardRepo.findBySetCode(set);
     }
 
-    @GetMapping("/{setCode}/{cardName}")
+    @GetMapping("/{set}/{name}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all cards of a given name in a single set")
     public List<DatabaseCard> getAllCardsOfNameInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name){
         return dbCardRepo.findBySetCodeAndName(set,name);
     }
 
-    @GetMapping("/{setCode}/{cardName}/{collectorNumber}")
+    @GetMapping("/{set}/{name}/{collectorNumber}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns a specific version of a card in a single set")
     public List<DatabaseCard> getSpecificVersionOfCardInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name, @Parameter(description = "collectorNumber") @PathVariable String collectorNumber){
@@ -83,6 +83,7 @@ public class DatabaseCardController {
                 existingCard.setImageUris(dbCard.getImageUris());
                 existingCard.setCardFaces(dbCard.getCardFaces());
                 existingCard.setPromoTypes(dbCard.getPromoTypes());
+                existingCard.setFinishes(dbCard.getFinishes());
                 return dbCardRepo.save(existingCard);
             }
         }

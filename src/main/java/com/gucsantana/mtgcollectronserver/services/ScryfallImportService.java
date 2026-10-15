@@ -38,8 +38,8 @@ public class ScryfallImportService {
     private static final String SETS_URL = "https://api.scryfall.com/sets";
     private static final String CARD_UPSERT_SQL = """
             INSERT INTO cards
-                (id, set_code, name, collector_number, rarity, prices, image_uris, card_faces, promo_types)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id, set_code, name, collector_number, rarity, prices, image_uris, card_faces, promo_types, finishes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
                 set_code = VALUES(set_code),
                 name = VALUES(name),
@@ -48,7 +48,8 @@ public class ScryfallImportService {
                 prices = VALUES(prices),
                 image_uris = VALUES(image_uris),
                 card_faces = VALUES(card_faces),
-                promo_types = VALUES(promo_types)
+                promo_types = VALUES(promo_types),
+                finishes = VALUES(finishes)
             """;
     private static final String SET_UPSERT_SQL = """
             INSERT INTO sets
@@ -243,6 +244,7 @@ public class ScryfallImportService {
             statement.setString(7, card.imageUris());
             statement.setString(8, card.cardFaces());
             statement.setString(9, card.promoTypes());
+            statement.setString(10, card.finishes());
         });
         return batch.size();
     }
@@ -257,7 +259,8 @@ public class ScryfallImportService {
                 optionalJson(card, "prices"),
                 optionalJson(card, "image_uris"),
                 optionalJson(card, "card_faces"),
-                optionalJson(card, "promo_types"));
+                optionalJson(card, "promo_types"),
+                optionalJson(card, "finishes"));
     }
 
     private JsonNode getJson(String url) throws IOException, InterruptedException {
@@ -393,7 +396,8 @@ public class ScryfallImportService {
             String prices,
             String imageUris,
             String cardFaces,
-            String promoTypes) {
+            String promoTypes,
+            String finishes) {
     }
 
     private record SetRow(

@@ -55,6 +55,10 @@ public class DatabaseCard implements Serializable {
     @JsonProperty("promo_types")
     private List<String> promoTypes;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "json")
+    private List<String> finishes;
+
     public String getId() {
         return id;
     }
@@ -125,5 +129,13 @@ public class DatabaseCard implements Serializable {
 
     public void setPromoTypes(List<String> promo_types) {
         this.promoTypes = promo_types;
+    }
+
+    public List<String> getFinishes() {
+        return finishes;
+    }
+
+    public void setFinishes(List<String> finishes) {
+        this.finishes = finishes;
     }
 }
