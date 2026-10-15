@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface DatabaseCardRepository extends JpaRepository<DatabaseCard,String>{
-    List<DatabaseCard> findBySetCode(String set);
-    List<DatabaseCard> findBySetCodeAndName(String set, String name);
-    List<DatabaseCard> findBySetCodeAndNameAndCollectorNumber(String set, String name, String collector_number);
+    List<DatabaseCard> findBySetCodeOrderByCollectorNumberAsc(String set);
+    List<DatabaseCard> findBySetCodeAndNameOrderByCollectorNumberAsc(String set, String name);
+    List<DatabaseCard> findBySetCodeAndNameAndCollectorNumberOrderByCollectorNumberAsc(String set, String name, String collector_number);
 }
