@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.gucsantana.mtgcollectronserver.RegisterUserRequest;
 import com.gucsantana.mtgcollectronserver.models.User;
 import com.gucsantana.mtgcollectronserver.repos.UserRepository;
 
@@ -28,15 +27,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/user")
 public class UserController {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
     
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -47,24 +44,6 @@ public class UserController {
     public UserResponse getUser(
             @Parameter(description = "User ID") @PathVariable Long id) {
         return toUserResponse(findUser(id));
-    }
-
-    @PostMapping("/register")
-    @CacheEvict(value = "user-cache", allEntries = true)
-    @Operation(summary = "Creates a user account by passing valid username, password and email fields")
-    public UserResponse createNewAccount(@Valid @RequestBody RegisterUserRequest request) {
-        User newUser = new User();
-        newUser.setEmail(request.email());
-        newUser.setUsername(request.username());
-        newUser.setPasswordHash(passwordEncoder.encode(request.password()));
-
-        LocalDateTime now = LocalDateTime.now();
-        newUser.setCreatedAt(now);
-        newUser.setUpdatedAt(now);
-
-        UserResponse createdUser = toUserResponse(userRepository.save(newUser));
-        LOGGER.info("Created new account for user "+ newUser.getUsername() + ", with email " + newUser.getEmail() );
-        return createdUser;
     }
 
     @PutMapping("/{id}")
@@ -96,9 +75,9 @@ public class UserController {
     @DeleteMapping("/{id}")
     @CacheEvict(value = "user-cache", allEntries = true)
     @Operation(summary = "Deletes a user account")
-    public void deleteUser(
-            @Parameter(description = "User ID") @PathVariable Long id) {
-        userRepository.deleteById(id);
+    public void deleteUser(@Parameter(description = "User ID") @PathVariable Long id) {
+                userRepository.deleteById(id);
+                LOGGER.info("Deleted user with id " + id);
     }
 
     private User findUser(Long id) {
