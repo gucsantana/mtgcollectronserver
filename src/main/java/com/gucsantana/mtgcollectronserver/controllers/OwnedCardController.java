@@ -1,6 +1,5 @@
 package com.gucsantana.mtgcollectronserver.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,9 +28,12 @@ import jakarta.validation.Valid;
 @Tag(name = "Owned Cards REST Endpoint")
 public class OwnedCardController {
 
-    @Autowired
-    OwnedCardRepository ownCardRepo;
+    final OwnedCardRepository ownCardRepo;
 
+    OwnedCardController(OwnedCardRepository ownCardRepo) {
+        this.ownCardRepo = ownCardRepo;
+    }
+    
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(OwnedCardController.class);
 
     @GetMapping("/{id}")

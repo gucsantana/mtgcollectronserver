@@ -1,11 +1,12 @@
 package com.gucsantana.mtgcollectronserver.controllers;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.gucsantana.mtgcollectronserver.RegisterUserRequest;
 import com.gucsantana.mtgcollectronserver.models.User;
 import com.gucsantana.mtgcollectronserver.repos.UserRepository;
 
@@ -26,23 +28,18 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/auth")
 public class UserController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-
-    @GetMapping
-    @Cacheable("user-cache")
-    @Operation(summary = "Returns all users")
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(UserController::toUserResponse)
-                .toList();
-    }
+    
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/{id}")
     @Cacheable("user-cache")
@@ -52,11 +49,22 @@ public class UserController {
         return toUserResponse(findUser(id));
     }
 
-    @PostMapping
+    @PostMapping("/register")
     @CacheEvict(value = "user-cache", allEntries = true)
-    @Operation(summary = "Creates a user account")
-    public UserResponse createUser(@Valid @RequestBody User user) {
-        return toUserResponse(userRepository.save(user));
+    @Operation(summary = "Creates a user account by passing valid username, password and email fields")
+    public UserResponse createNewAccount(@Valid @RequestBody RegisterUserRequest request) {
+        User newUser = new User();
+        newUser.setEmail(request.email());
+        newUser.setUsername(request.username());
+        newUser.setPasswordHash(passwordEncoder.encode(request.password()));
+
+        LocalDateTime now = LocalDateTime.now();
+        newUser.setCreatedAt(now);
+        newUser.setUpdatedAt(now);
+
+        UserResponse createdUser = toUserResponse(userRepository.save(newUser));
+        LOGGER.info("Created new account for user "+ newUser.getUsername() + ", with email " + newUser.getEmail() );
+        return createdUser;
     }
 
     @PutMapping("/{id}")

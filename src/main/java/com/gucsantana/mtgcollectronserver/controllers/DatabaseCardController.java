@@ -1,6 +1,5 @@
 package com.gucsantana.mtgcollectronserver.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gucsantana.mtgcollectronserver.models.DatabaseCard;
 import com.gucsantana.mtgcollectronserver.repos.DatabaseCardRepository;
 
+import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.List;
 
 // import org.slf4j.LoggerFactory;
@@ -23,8 +24,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name="Database Cards REST Endpoint")
 public class DatabaseCardController {
 
-    @Autowired 
-    DatabaseCardRepository dbCardRepo;
+    final DatabaseCardRepository dbCardRepo;
+
+    DatabaseCardController(DatabaseCardRepository dbCardRepo) {
+        this.dbCardRepo = dbCardRepo;
+    }
 
     // private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(DatabaseCardController.class);
 
@@ -32,20 +36,38 @@ public class DatabaseCardController {
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all database cards for a single set")
     public List<DatabaseCard> getAllCardsBySet(@Parameter(description = "Set Code") @PathVariable String set){
-        return dbCardRepo.findBySetCodeOrderByCollectorNumberAsc(set);
+        List<DatabaseCard> cards = dbCardRepo.findBySetCode(set);
+        cards.sort(Comparator.comparing(
+                card -> numericCollectorNumber(card.getCollectorNumber()),
+                Comparator.nullsLast(Comparator.naturalOrder())));
+        return cards;
     }
 
     @GetMapping("/{set}/{name}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all cards of a given name in a single set")
     public List<DatabaseCard> getAllCardsOfNameInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name){
-        return dbCardRepo.findBySetCodeAndNameOrderByCollectorNumberAsc(set,name);
+        List<DatabaseCard> cards = dbCardRepo.findBySetCodeAndName(set,name);
+        cards.sort(Comparator.comparing(
+                card -> numericCollectorNumber(card.getCollectorNumber()),
+                Comparator.nullsLast(Comparator.naturalOrder())));
+        return cards;
     }
 
     @GetMapping("/{set}/{name}/{collectorNumber}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns a specific version of a card in a single set")
     public List<DatabaseCard> getSpecificVersionOfCardInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name, @Parameter(description = "collectorNumber") @PathVariable String collectorNumber){
-        return dbCardRepo.findBySetCodeAndNameAndCollectorNumberOrderByCollectorNumberAsc(set,name,collectorNumber);
+        return dbCardRepo.findBySetCodeAndNameAndCollectorNumber(set,name,collectorNumber);
+    }
+
+    // auxiliary method to strip a collector number of non-digits and then convert it to integer
+    private static BigInteger numericCollectorNumber(String collectorNumber) {
+        if (collectorNumber == null) {
+            return null;
+        }
+
+        String digits = collectorNumber.replaceAll("\\D", "");
+        return digits.isEmpty() ? null : new BigInteger(digits);
     }
 }
