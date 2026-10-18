@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,6 @@ import com.gucsantana.mtgcollectronserver.models.User;
 import com.gucsantana.mtgcollectronserver.repos.UserRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -72,6 +73,7 @@ public class AuthController {
                     UsernamePasswordAuthenticationToken.unauthenticated(
                             request.username(), request.password()));
         } catch (AuthenticationException exception) {
+            LOGGER.warn("Invalid username or password for user "+ request.username());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
 
@@ -88,10 +90,18 @@ public class AuthController {
     }
 
     @GetMapping("/session")
-    public String getMethodName(@RequestParam String param) {
-        return new String();
+    public ResponseEntity<SessionResponse> checkValidSession() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new SessionResponse(false, null));
+        }
+
+        return ResponseEntity.ok(new SessionResponse(true, authentication.getName()));
     }
-    
+
 
     @PostMapping("/register")
     @Operation(summary = "Creates a user account by passing valid username, password and email fields")
@@ -134,5 +144,8 @@ public class AuthController {
     }
 
     public record LoginResponse(String username) {
+    }
+
+    public record SessionResponse(boolean authenticated, String username) {
     }
 }
