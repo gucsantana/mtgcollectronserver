@@ -81,7 +81,7 @@ public class OwnedCardController {
 
     @PutMapping("/")
     @CacheEvict(value = "owned-card-cache", allEntries = true)
-    @Operation(summary = "Updates a database card object by passing in a pre-filled OwnedCard instance; uses ID to match")
+    @Operation(summary = "Updates a database card object by passing in a pre-filled OwnedCard instance; uses ID,set code,card name,collector number to match")
     public OwnedCard updateOwnedCard(@Valid @RequestBody OwnedCard ownCard) {
         LOGGER.info("Updated database card: " + ownCard.getCardName() + " on set " + ownCard.getSetCode()
                 + " with collector number " + ownCard.getCollectorNumber() + " for user " + ownCard.getCardOwnerId());

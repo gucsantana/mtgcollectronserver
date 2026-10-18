@@ -9,4 +9,5 @@ import com.gucsantana.mtgcollectronserver.models.UserSetInfo.UserSetInfoId;
 
 public interface UserSetInfoRepository extends JpaRepository<UserSetInfo,UserSetInfoId>{
     List<UserSetInfo> findByCardOwnerId(Long cardOwnerId);
+    List<UserSetInfo> findByCardOwnerIdAndSetCode(Long cardOwnerId,String setCode);
 }

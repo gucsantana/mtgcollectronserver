@@ -87,7 +87,9 @@ public class AuthController {
         SecurityContextHolder.setContext(context);
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
-        return new LoginResponse(authentication.getName());
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Authenticated user was not found"));
+        return new LoginResponse(user.getId(), authentication.getName());
     }
 
     @PostMapping("/logout")
@@ -110,10 +112,12 @@ public class AuthController {
                 || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new SessionResponse(false, null));
+                    .body(new SessionResponse(false, null, null));
         }
 
-        return ResponseEntity.ok(new SessionResponse(true, authentication.getName()));
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Authenticated user was not found"));
+        return ResponseEntity.ok(new SessionResponse(true, user.getId(), authentication.getName()));
     }
 
 
@@ -157,9 +161,9 @@ public class AuthController {
             LocalDateTime updatedAt) {
     }
 
-    public record LoginResponse(String username) {
+    public record LoginResponse(Long userId, String username) {
     }
 
-    public record SessionResponse(boolean authenticated, String username) {
+    public record SessionResponse(boolean authenticated, Long userId, String username) {
     }
 }
