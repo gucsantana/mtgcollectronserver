@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +88,19 @@ public class AuthController {
         securityContextRepository.saveContext(context, httpRequest, httpResponse);
 
         return new LoginResponse(authentication.getName());
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logs out the current user by invalidating the session")
+    public ResponseEntity<Void> logoutUser(HttpServletRequest httpRequest) {
+        SecurityContextHolder.clearContext();
+
+        HttpSession session = httpRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/session")
