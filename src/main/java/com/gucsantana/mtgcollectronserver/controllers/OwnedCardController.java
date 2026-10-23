@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gucsantana.mtgcollectronserver.models.OwnedCard;
+import com.gucsantana.mtgcollectronserver.dto.OwnedCardDeleteRequest;
 import com.gucsantana.mtgcollectronserver.dto.OwnedCardPatchRequest;
 import com.gucsantana.mtgcollectronserver.repos.OwnedCardRepository;
 
@@ -127,9 +128,8 @@ public class OwnedCardController {
     @DeleteMapping("/")
     @CacheEvict(value = "owned-card-cache", allEntries = true)
     @Operation(summary = "Deletes a database card by passing its owner's id, set code, and collector number")
-    public void deleteOwnedCard(@Parameter(description = "User ID") @PathVariable Long id,
-            @Parameter(description = "Set Code") @PathVariable String setCode,
-            @Parameter(description = "Collector Number") @PathVariable String collectorNumber) {
-        ownCardRepo.deleteByCardOwnerIdAndSetCodeAndCollectorNumber(id, setCode, collectorNumber);
+    public void deleteOwnedCard(@Valid @RequestBody OwnedCardDeleteRequest request) {
+        ownCardRepo.deleteByCardOwnerIdAndSetCodeAndCollectorNumber(
+                request.getCardOwnerId(), request.getSetCode(), request.getCollectorNumber());
     }
 }
