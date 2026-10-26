@@ -25,18 +25,18 @@ public class OwnedCard implements Serializable {
 
     @Id
     @NotNull
-    @Column(name = "set_code", length = 10, nullable = false)
+    @Column(name = "set_code", length = 15, nullable = false)
     @JsonProperty("set_code")
     private String setCode;
 
     @NotNull
-    @Column(name = "card_name", length = 100, nullable = false)
+    @Column(name = "card_name", length = 200, nullable = false)
     @JsonProperty("card_name")
     private String cardName;
 
     @Id
     @NotNull
-    @Column(name = "collector_number", length = 7, nullable = false)
+    @Column(name = "collector_number", length = 20, nullable = false)
     @JsonProperty("collector_number")
     private String collectorNumber;
 

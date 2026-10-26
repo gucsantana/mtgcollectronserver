@@ -64,7 +64,8 @@ public class SecurityConfiguration {
                         .securityContextRepository(securityContextRepository))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(request ->
                         HttpMethod.POST.matches(request.getMethod())
-                                && "/auth/register".equals(request.getServletPath()))
+                                && ("/auth/register".equals(request.getServletPath())
+                                        || "/importbackup".equals(request.getServletPath())))
                         .withObjectPostProcessor(new ObjectPostProcessor<CsrfFilter>() {
                             @Override
                                     public CsrfFilter postProcess(CsrfFilter filter) {
