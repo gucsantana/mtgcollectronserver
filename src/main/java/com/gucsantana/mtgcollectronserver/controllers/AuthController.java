@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +32,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.gucsantana.mtgcollectronserver.dto.LoginRequest;
 import com.gucsantana.mtgcollectronserver.dto.RegisterUserRequest;
 import com.gucsantana.mtgcollectronserver.models.User;
+import com.gucsantana.mtgcollectronserver.models.UserPreferences;
 import com.gucsantana.mtgcollectronserver.repos.UserRepository;
+import com.gucsantana.mtgcollectronserver.repos.UserPreferencesRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -40,6 +44,7 @@ import io.swagger.v3.oas.annotations.Operation;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final UserPreferencesRepository userPreferencesRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
@@ -49,10 +54,12 @@ public class AuthController {
     AuthController(
             PasswordEncoder passwordEncoder,
             UserRepository userRepository,
+            UserPreferencesRepository userPreferencesRepository,
             AuthenticationManager authenticationManager,
             SecurityContextRepository securityContextRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.userPreferencesRepository = userPreferencesRepository;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
     }
@@ -123,6 +130,8 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Creates a user account by passing valid username, password and email fields")
+    @Transactional
+    @CacheEvict(value = "user-preferences-cache", allEntries = true)
     public UserResponse createNewAccount(@Valid @RequestBody RegisterUserRequest request) {
         User newUser = new User();
         newUser.setEmail(request.email());
@@ -133,7 +142,18 @@ public class AuthController {
         newUser.setCreatedAt(now);
         newUser.setUpdatedAt(now);
 
-        UserResponse createdUser = toUserResponse(userRepository.save(newUser));
+        User savedUser = userRepository.save(newUser);
+
+        UserPreferences preferences = new UserPreferences();
+        preferences.setUserId(savedUser.getId());
+        preferences.setFullSetOptionSelected(1);
+        preferences.setCardPerPageOptionSelected(60);
+        preferences.setDarkMode(false);
+        preferences.setShowPrices(true);
+        preferences.setShowSidebarPercent(true);
+        userPreferencesRepository.save(preferences);
+
+        UserResponse createdUser = toUserResponse(savedUser);
         LOGGER.info("Created new account for user "+ newUser.getUsername() + ", with email " + newUser.getEmail() );
         return createdUser;
     }
