@@ -144,10 +144,18 @@ public class ImportController {
         JsonNode count = details.get("count");
         JsonNode foil = details.get("foil");
         JsonNode extra = details.get("extra");
+        JsonNode tagSquare = details.get("tag_square");
+        JsonNode tagCircle = details.get("tag_circle");
+        JsonNode tagTriangle = details.get("tag_triangle");
+        JsonNode tagCross = details.get("tag_cross");
         if (count == null || !count.isIntegralNumber() || !count.canConvertToInt()
                 || count.intValue() < 0
                 || foil == null || !foil.isBoolean()
-                || extra == null || !extra.isBoolean()) {
+                || extra == null || !extra.isBoolean()
+                || (tagSquare != null && !tagSquare.isBoolean())
+                || (tagCircle != null && !tagCircle.isBoolean())
+                || (tagTriangle != null && !tagTriangle.isBoolean())
+                || (tagCross != null && !tagCross.isBoolean())) {
             throw badRequest("Invalid card details for " + cardName + " (" + setCode + "/" + collectorNumber + ")");
         }
 
@@ -158,6 +166,10 @@ public class ImportController {
         card.setCollectorNumber(collectorNumber);
         card.setCardCount(count.intValue());
         card.setIsFoil(foil.booleanValue());
+        card.setIsTaggedSquare(tagSquare != null && tagSquare.booleanValue());
+        card.setIsTaggedCircle(tagCircle != null && tagCircle.booleanValue());
+        card.setIsTaggedTriangle(tagTriangle != null && tagTriangle.booleanValue());
+        card.setIsTaggedCross(tagCross != null && tagCross.booleanValue());
         card.setIsConsideredExtra(extra.booleanValue());
         return card;
     }

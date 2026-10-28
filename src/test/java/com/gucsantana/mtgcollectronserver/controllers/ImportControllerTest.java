@@ -73,6 +73,10 @@ class ImportControllerTest {
                     && card.getCollectorNumber().equals("42")
                     && card.getCardCount().equals(3)
                     && card.getIsFoil()
+                    && !card.getIsTaggedSquare()
+                    && !card.getIsTaggedCircle()
+                    && !card.getIsTaggedTriangle()
+                    && !card.getIsTaggedCross()
                     && !card.getIsConsideredExtra();
         }));
         verify(sets).saveAll(argThat(imported -> {
