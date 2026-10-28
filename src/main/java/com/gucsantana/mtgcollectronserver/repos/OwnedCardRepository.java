@@ -14,5 +14,6 @@ public interface OwnedCardRepository extends JpaRepository<OwnedCard,OwnedCardId
     List<OwnedCard> findByCardOwnerIdAndSetCode(Long userId,String setCode);
     List<OwnedCard> findByCardOwnerIdAndSetCodeAndCardName(Long userId,String setCode, String cardName);
     List<OwnedCard> findByCardOwnerIdAndSetCodeAndCardNameAndCollectorNumber(Long userId,String setCode, String cardName, String collectorNumber);
+    List<OwnedCard> findByCardOwnerIdAndCardNameContainingIgnoreCase(Long userId, String cardName);
     List<OwnedCard> deleteByCardOwnerIdAndSetCodeAndCollectorNumber(Long userId,String setCode, String collectorNumber);
 }

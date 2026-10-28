@@ -74,6 +74,16 @@ public class OwnedCardController {
         return ownCardRepo.findByCardOwnerIdAndSetCodeAndCardNameAndCollectorNumber(id, setCode, cardName, collectorNumber);
     }
 
+    @GetMapping("/card-finder/{id}/{cardName}")
+    @Cacheable(value = "owned-card-cache")
+    @Operation(summary = "Returns all owned cards for a single user that partially match the card name provided")
+    public List<OwnedCard> getAllCardsOfUserMatchingCardName(@Parameter(description = "User ID") @PathVariable Long id,
+            @Parameter(description = "Card Name") @PathVariable String cardName) {
+        return ownCardRepo.findByCardOwnerIdAndCardNameContainingIgnoreCase(id,cardName);
+    }
+
+    // -------------------------------------------------------------------------------------------
+
     @PostMapping("/")
     @CacheEvict(value = "owned-card-cache", allEntries = true)
     @Operation(summary = "Creates a database card object by passing in a pre-filled OwnedCard instance")
