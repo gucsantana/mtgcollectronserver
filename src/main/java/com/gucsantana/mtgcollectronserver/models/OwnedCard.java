@@ -30,7 +30,7 @@ public class OwnedCard implements Serializable {
     private String setCode;
 
     @NotNull
-    @Column(name = "card_name", length = 200, nullable = false)
+    @Column(name = "card_name", length = 255, nullable = false)
     @JsonProperty("card_name")
     private String cardName;
 
