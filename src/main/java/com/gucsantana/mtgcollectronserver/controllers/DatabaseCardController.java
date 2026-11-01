@@ -54,11 +54,11 @@ public class DatabaseCardController {
         return cards;
     }
 
-    @GetMapping("/{set}/{name}/{collectorNumber}")
+    @GetMapping("/bynumber/{set}/{collectorNumber}")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns a specific version of a card in a single set")
-    public List<DatabaseCard> getSpecificVersionOfCardInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name, @Parameter(description = "collectorNumber") @PathVariable String collectorNumber){
-        return dbCardRepo.findBySetCodeAndNameAndCollectorNumber(set,name,collectorNumber);
+    public List<DatabaseCard> getSpecificVersionOfCardInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "collectorNumber") @PathVariable String collectorNumber){
+        return dbCardRepo.findBySetCodeAndCollectorNumber(set,collectorNumber);
     }
 
     // auxiliary method to strip a collector number of non-digits and then convert it to integer
