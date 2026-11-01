@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import com.gucsantana.mtgcollectronserver.dto.OwnedCardDeleteRequest;
+import com.gucsantana.mtgcollectronserver.dto.OwnedCardByNameSearchRequest;
 import com.gucsantana.mtgcollectronserver.dto.OwnedCardPatchRequest;
 import com.gucsantana.mtgcollectronserver.models.OwnedCard;
 import com.gucsantana.mtgcollectronserver.repos.OwnedCardRepository;
@@ -60,5 +61,15 @@ class OwnedCardControllerTest {
         new OwnedCardController(repository).deleteOwnedCard(request);
 
         verify(repository).deleteByCardOwnerIdAndSetCodeAndCollectorNumber(7L, "tst", "42");
+    }
+
+    @Test
+    void findingOwnedCardsByPartialNameUsesRequestDetails() {
+        OwnedCardRepository repository = mock(OwnedCardRepository.class);
+        OwnedCardByNameSearchRequest request = new OwnedCardByNameSearchRequest(7L, "Example");
+
+        new OwnedCardController(repository).getAllCardsOfUserMatchingCardName(request);
+
+        verify(repository).findByCardOwnerIdAndCardNameContainingIgnoreCase(7L, "Example");
     }
 }

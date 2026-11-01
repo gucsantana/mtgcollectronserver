@@ -12,7 +12,7 @@ public interface OwnedCardRepository extends JpaRepository<OwnedCard,OwnedCardId
     Optional<OwnedCard> findByCardOwnerIdAndSetCodeAndCollectorNumber(Long userId, String setCode, String collectorNumber);
     List<OwnedCard> findByCardOwnerId(Long userId);
     List<OwnedCard> findByCardOwnerIdAndSetCode(Long userId,String setCode);
-    List<OwnedCard> findByCardOwnerIdAndSetCodeAndCardName(Long userId,String setCode, String cardName);
+    List<OwnedCard> findByCardOwnerIdAndCardName(Long userId, String cardName);
     List<OwnedCard> findByCardOwnerIdAndSetCodeAndCardNameAndCollectorNumber(Long userId,String setCode, String cardName, String collectorNumber);
     List<OwnedCard> findByCardOwnerIdAndCardNameContainingIgnoreCase(Long userId, String cardName);
     List<OwnedCard> deleteByCardOwnerIdAndSetCodeAndCollectorNumber(Long userId,String setCode, String collectorNumber);

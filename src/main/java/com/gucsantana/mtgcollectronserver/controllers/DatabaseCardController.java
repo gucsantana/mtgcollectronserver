@@ -3,15 +3,20 @@ package com.gucsantana.mtgcollectronserver.controllers;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gucsantana.mtgcollectronserver.dto.CardsByNameInSetRequest;
 import com.gucsantana.mtgcollectronserver.models.DatabaseCard;
 import com.gucsantana.mtgcollectronserver.repos.DatabaseCardRepository;
 
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.List;
+
+import jakarta.validation.Valid;
 
 // import org.slf4j.LoggerFactory;
 
@@ -43,11 +48,11 @@ public class DatabaseCardController {
         return cards;
     }
 
-    @GetMapping("/{set}/{name}")
+    @PostMapping("/byname")
     @Cacheable (value = "db-card-cache")
     @Operation (summary = "Returns all cards of a given name in a single set")
-    public List<DatabaseCard> getAllCardsOfNameInSet(@Parameter(description = "Set Code") @PathVariable String set, @Parameter(description = "Card Name") @PathVariable String name){
-        List<DatabaseCard> cards = dbCardRepo.findBySetCodeAndName(set,name);
+    public List<DatabaseCard> getAllCardsOfNameInSet(@Valid @RequestBody CardsByNameInSetRequest request){
+        List<DatabaseCard> cards = dbCardRepo.findBySetCodeAndName(request.set(), request.name());
         cards.sort(Comparator.comparing(
                 card -> numericCollectorNumber(card.getCollectorNumber()),
                 Comparator.nullsLast(Comparator.naturalOrder())));

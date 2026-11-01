@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gucsantana.mtgcollectronserver.models.OwnedCard;
 import com.gucsantana.mtgcollectronserver.dto.OwnedCardDeleteRequest;
+import com.gucsantana.mtgcollectronserver.dto.OwnedCardByNameSearchRequest;
 import com.gucsantana.mtgcollectronserver.dto.OwnedCardPatchRequest;
 import com.gucsantana.mtgcollectronserver.repos.OwnedCardRepository;
 
@@ -55,13 +56,12 @@ public class OwnedCardController {
         return ownCardRepo.findByCardOwnerIdAndSetCode(id, setCode);
     }
 
-    @GetMapping("/{id}/{setCode}/{cardName}")
+    @PostMapping("/byname")
     @Cacheable(value = "owned-card-cache")
-    @Operation(summary = "Returns all owned cards of a single set for a single user matching the given name")
-    public List<OwnedCard> getAllCardsOfUserInSetWithName(@Parameter(description = "User ID") @PathVariable Long id,
-            @Parameter(description = "Set Code") @PathVariable String setCode,
-            @Parameter(description = "CardName") @PathVariable String cardName) {
-        return ownCardRepo.findByCardOwnerIdAndSetCodeAndCardName(id, setCode, cardName);
+    @Operation(summary = "Returns all owned cards of a single user matching the given name")
+    public List<OwnedCard> getAllCardsOfUserInSetWithName(
+            @Valid @RequestBody OwnedCardByNameSearchRequest request) {
+        return ownCardRepo.findByCardOwnerIdAndCardName(request.cardOwnerId(), request.cardName());
     }
 
     @GetMapping("/{id}/{setCode}/{cardName}/{collectorNumber}")
@@ -74,12 +74,13 @@ public class OwnedCardController {
         return ownCardRepo.findByCardOwnerIdAndSetCodeAndCardNameAndCollectorNumber(id, setCode, cardName, collectorNumber);
     }
 
-    @GetMapping("/card-finder/{id}/{cardName}")
+    @PostMapping("/card-finder")
     @Cacheable(value = "owned-card-cache")
     @Operation(summary = "Returns all owned cards for a single user that partially match the card name provided")
-    public List<OwnedCard> getAllCardsOfUserMatchingCardName(@Parameter(description = "User ID") @PathVariable Long id,
-            @Parameter(description = "Card Name") @PathVariable String cardName) {
-        return ownCardRepo.findByCardOwnerIdAndCardNameContainingIgnoreCase(id,cardName);
+    public List<OwnedCard> getAllCardsOfUserMatchingCardName(
+            @Valid @RequestBody OwnedCardByNameSearchRequest request) {
+        return ownCardRepo.findByCardOwnerIdAndCardNameContainingIgnoreCase(
+                request.cardOwnerId(), request.cardName());
     }
 
     // -------------------------------------------------------------------------------------------
