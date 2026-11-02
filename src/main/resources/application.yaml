@@ -2,11 +2,11 @@ spring:
   application:
     name: mtgcollectronserver
   datasource:
-    url: jdbc:mysql://localhost:3306/mtg_collectron
-    username: admin
+    url: ${COLLECTRON_DATASOURCE_URL}
+    username: ${DB_USER}
     password: ${DB_PASS}
   jpa:
-    show-sql: true
+    show-sql: false
   servlet:
     multipart:
       max-file-size: 10MB
@@ -29,22 +29,6 @@ server:
 #     url: http://localhost:8080/mtg-collectron/card/
 
 logging:
-  file:
-    name: logs/application.log
   level:
-    root: error
-    org:
-      springframework:
-        web: debug    # necessary to see 400 error descriptions show up on log
-
-# management:
-#   endpoint:
-#     health:
-#       show-details: always
-#   endpoints:
-#     web:
-#       exposure:
-#         include: "*"
-#   info:
-#     env:
-#       enabled: true
+    root: INFO
+    org.springframework.web: WARN
