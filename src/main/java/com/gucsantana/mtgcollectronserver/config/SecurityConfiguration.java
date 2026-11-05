@@ -2,6 +2,7 @@ package com.gucsantana.mtgcollectronserver.config;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,11 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.gucsantana.mtgcollectronserver.repos.UserRepository;
 
@@ -56,10 +62,30 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    CorsConfigurationSource corsConfigurationSource(Environment environment) {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("https://d2br05wdxuiqkf.cloudfront.net"));
+        if (!environment.acceptsProfiles(Profiles.of("prod"))) {
+            configuration.setAllowedOriginPatterns(List.of(
+                    "http://localhost:[*]",
+                    "http://127.0.0.1:[*]"));
+        }
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "X-CSRF-TOKEN"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            SecurityContextRepository securityContextRepository) throws Exception {
+            SecurityContextRepository securityContextRepository,
+            CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .securityContext(securityContext -> securityContext
                         .securityContextRepository(securityContextRepository))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(request ->
