@@ -2,6 +2,7 @@ package com.gucsantana.mtgcollectronserver.controllers;
 
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,8 @@ public class UserSetInfoController {
     public UserSetInfoController(UserSetInfoRepository userSetInfoRepository) {
         this.userSetInfoRepository = userSetInfoRepository;
     }
+    
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(UserSetInfoController.class);
 
     @GetMapping("/{cardOwnerId}")
     @Cacheable("user-set-info-cache")
@@ -57,6 +60,7 @@ public class UserSetInfoController {
     @CacheEvict(value = "user-set-info-cache", allEntries = true)
     @Operation(summary = "Creates user set information")
     public UserSetInfo createUserSetInfo(@Valid @RequestBody UserSetInfo userSetInfo) {
+        LOGGER.info("Created set "+ userSetInfo.getSetCode() + " entry on the database for user "+userSetInfo.getCardOwnerId());
         return userSetInfoRepository.save(userSetInfo);
     }
 

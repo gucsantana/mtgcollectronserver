@@ -20,6 +20,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
@@ -36,6 +39,8 @@ public class ScryfallImportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScryfallImportService.class);
     private static final String BULK_DATA_URL = "https://api.scryfall.com/bulk-data";
     private static final String SETS_URL = "https://api.scryfall.com/sets";
+    private static final int BULK_DOWNLOAD_ATTEMPTS = 3;
+    private static final Duration BULK_DOWNLOAD_TIMEOUT = Duration.ofMinutes(10);
     private static final String CARD_UPSERT_SQL = """
             INSERT INTO cards
                 (id, set_code, name, collector_number, rarity, prices, image_uris, card_faces, promo_types, finishes)
@@ -184,41 +189,81 @@ public class ScryfallImportService {
 
     private int importCards(int importedSets, Instant startedAt) throws IOException, InterruptedException {
         String downloadUri = findDefaultCardsDownloadUri();
-        try (InputStream responseBody = getStream(downloadUri);
-                GZIPInputStream gzipInput = new GZIPInputStream(responseBody);
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(gzipInput, StandardCharsets.UTF_8), 64 * 1024)) {
-            List<CardRow> batch = new ArrayList<>(batchSize);
-            int importedCount = 0;
-            String line;
-            long lineNumber = 0;
-            while ((line = reader.readLine()) != null) {
-                lineNumber++;
-                if (line.isBlank()) {
-                    continue;
-                }
-                CardRow cardRow;
-                try {
-                    JsonNode card = objectMapper.readTree(line);
-                    if (!hasPaperGame(card) || isMeldResult(card)) {
+        Path downloadFile = Files.createTempFile("scryfall-default-cards-", ".json.gz");
+        try {
+            downloadToFile(downloadUri, downloadFile);
+            try (InputStream responseBody = Files.newInputStream(downloadFile);
+                    GZIPInputStream gzipInput = new GZIPInputStream(responseBody);
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(gzipInput, StandardCharsets.UTF_8), 64 * 1024)) {
+                List<CardRow> batch = new ArrayList<>(batchSize);
+                int importedCount = 0;
+                String line;
+                long lineNumber = 0;
+                while ((line = reader.readLine()) != null) {
+                    lineNumber++;
+                    if (line.isBlank()) {
                         continue;
                     }
-                    cardRow = toCardRow(card);
-                } catch (IOException exception) {
-                    throw new IOException("Invalid Scryfall card data on bulk-data line " + lineNumber, exception);
+                    CardRow cardRow;
+                    try {
+                        JsonNode card = objectMapper.readTree(line);
+                        if (!hasPaperGame(card) || isMeldResult(card)) {
+                            continue;
+                        }
+                        cardRow = toCardRow(card);
+                    } catch (IOException exception) {
+                        throw new IOException("Invalid Scryfall card data on bulk-data line " + lineNumber, exception);
+                    }
+                    batch.add(cardRow);
+                    if (batch.size() == batchSize) {
+                        importedCount += saveCardBatch(batch);
+                        batch.clear();
+                        updateProgress(importedCount, importedSets);
+                    }
                 }
-                batch.add(cardRow);
-                if (batch.size() == batchSize) {
+                if (!batch.isEmpty()) {
                     importedCount += saveCardBatch(batch);
-                    batch.clear();
                     updateProgress(importedCount, importedSets);
                 }
+                return importedCount;
             }
-            if (!batch.isEmpty()) {
-                importedCount += saveCardBatch(batch);
-                updateProgress(importedCount, importedSets);
+        } finally {
+            Files.deleteIfExists(downloadFile);
+        }
+    }
+
+    private void downloadToFile(String url, Path destination) throws IOException, InterruptedException {
+        for (int attempt = 1; attempt <= BULK_DOWNLOAD_ATTEMPTS; attempt++) {
+            try {
+                HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                        .timeout(BULK_DOWNLOAD_TIMEOUT)
+                        .header("User-Agent", userAgent)
+                        .header("Accept", "application/json")
+                        .GET()
+                        .build();
+                HttpResponse<Path> response = httpClient.send(request,
+                        HttpResponse.BodyHandlers.ofFile(destination,
+                                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING));
+                if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                    String responseBody;
+                    try (InputStream body = Files.newInputStream(destination)) {
+                        responseBody = new String(body.readNBytes(4096), StandardCharsets.UTF_8);
+                    }
+                    throw new IOException("Scryfall request failed with HTTP " + response.statusCode()
+                            + (responseBody.isBlank() ? "" : ": " + responseBody));
+                }
+                return;
+            } catch (IOException exception) {
+                if (attempt == BULK_DOWNLOAD_ATTEMPTS) {
+                    throw new IOException("Scryfall bulk download failed after "
+                            + BULK_DOWNLOAD_ATTEMPTS + " attempts", exception);
+                }
+                LOGGER.warn("Scryfall bulk download attempt {}/{} failed; retrying",
+                        attempt, BULK_DOWNLOAD_ATTEMPTS, exception);
+                Files.deleteIfExists(destination);
+                Thread.sleep(Duration.ofSeconds(attempt).toMillis());
             }
-            return importedCount;
         }
     }
 

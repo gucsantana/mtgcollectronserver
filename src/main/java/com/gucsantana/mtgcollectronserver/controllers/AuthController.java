@@ -147,7 +147,7 @@ public class AuthController {
         UserPreferences preferences = new UserPreferences();
         preferences.setUserId(savedUser.getId());
         preferences.setFullSetOptionSelected(1);
-        preferences.setCardPerPageOptionSelected(60);
+        preferences.setCardPerPageOptionSelected(1);
         preferences.setDarkMode(false);
         preferences.setShowPrices(true);
         preferences.setShowSidebarPercent(true);
