@@ -1,4 +1,4 @@
-package com.gucsantana.mtgcollectronserver.controllers;
+package com.gucsantana.mtgcollectronserver.services;
 
 import java.io.IOException;
 import java.io.InputStream;

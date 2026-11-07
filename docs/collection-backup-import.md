@@ -1,6 +1,7 @@
 # Collection backup import
 
-Send an authenticated `POST` request to `/mtg-collectron/importbackup` as `multipart/form-data` with:
+Start an authenticated import with `POST /mtg-collectron/importbackup` as
+`multipart/form-data` with:
 
 * `file`: the collection backup CSV file
 * `userId`: the ID of the account being verified
@@ -29,7 +30,32 @@ When `additiveImport` is `false`, the user's existing cards and set info are rem
 * `full_set_every_single` is `(base_set_owned + extra_set_owned) / sets.card_count * 100`.
 * `full_set_one_each` is the sum of owned common, uncommon, rare, and mythic counts divided by the total database cards of those rarities, times 100.
 
-The endpoint verifies the supplied user ID and password and imports within a transaction. A successful response includes `setsImported` and `cardsImported`.
+The endpoint verifies the supplied user ID and password, queues the import, and
+returns `202 Accepted` promptly:
+
+```json
+{
+  "jobId": "a-random-uuid",
+  "state": "queued",
+  "startedAt": null,
+  "completedAt": null,
+  "setsImported": null,
+  "cardsImported": null,
+  "error": null
+}
+```
+
+Poll `GET /mtg-collectron/importbackup/jobs/{jobId}` every few seconds using the
+same authenticated username that submitted the import. The response has the
+same shape and a state of `queued`, `running`, `completed`, or `failed`.
+Completed jobs include `setsImported` and `cardsImported`; failed jobs include
+an `error` message. Stop polling on either terminal state, then refresh the
+collection after `completed`.
+
+The import itself runs in a database transaction. Job status is held in
+application memory and retained for up to 24 hours, so a process restart loses
+active job status. As with the deployment's other in-memory job, run a single
+ECS task unless shared job storage and coordination are added.
 
 The `user_cards.card_name` column must support 255 characters:
 

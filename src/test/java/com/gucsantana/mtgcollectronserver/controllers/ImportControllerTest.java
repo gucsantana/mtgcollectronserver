@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -12,34 +11,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.gucsantana.mtgcollectronserver.models.DatabaseCard;
 import com.gucsantana.mtgcollectronserver.models.DatabaseSet;
 import com.gucsantana.mtgcollectronserver.models.OwnedCard;
-import com.gucsantana.mtgcollectronserver.models.User;
 import com.gucsantana.mtgcollectronserver.models.UserSetInfo;
 import com.gucsantana.mtgcollectronserver.repos.DatabaseCardRepository;
 import com.gucsantana.mtgcollectronserver.repos.DatabaseSetRepository;
 import com.gucsantana.mtgcollectronserver.repos.OwnedCardRepository;
-import com.gucsantana.mtgcollectronserver.repos.UserRepository;
 import com.gucsantana.mtgcollectronserver.repos.UserSetInfoRepository;
+import com.gucsantana.mtgcollectronserver.services.CollectionBackupImportService;
 
 class ImportControllerTest {
 
     @Test
-    void replacesUserCollectionWithCsvAfterVerifyingPassword() {
+    void replacesUserCollectionWithCsv() {
         TestContext context = new TestContext();
-        ImportController.ImportResult result = context.controller.importBackup(
-                backupFile("\uFEFF" + validCsv("Name, with comma", "3", "true")),
-                7L, "correct-password", false);
+        CollectionBackupImportService.ImportResult result = context.service.importBackup(
+                backupContents("\uFEFF" + validCsv("Name, with comma", "3", "true")), 7L, false);
 
-        assertEquals(new ImportController.ImportResult(1, 1), result);
+        assertEquals(new CollectionBackupImportService.ImportResult(1, 1), result);
         verify(context.cards).deleteByCardOwnerId(7L);
         verify(context.sets).deleteByCardOwnerId(7L);
         verify(context.cards).saveAll(argThat(imported -> {
@@ -77,10 +70,10 @@ class ImportControllerTest {
         when(context.databaseCards.findBySetCodeIn(anyCollection()))
                 .thenReturn(List.of(databaseCard("tst", "42", "common")));
 
-        ImportController.ImportResult result = context.controller.importBackup(
-                backupFile(validCsv("Example Card", "3", "true")), 7L, "correct-password", true);
+        CollectionBackupImportService.ImportResult result = context.service.importBackup(
+                backupContents(validCsv("Example Card", "3", "true")), 7L, true);
 
-        assertEquals(new ImportController.ImportResult(1, 1), result);
+        assertEquals(new CollectionBackupImportService.ImportResult(1, 1), result);
         verify(context.cards, never()).deleteByCardOwnerId(any());
         verify(context.sets, never()).deleteByCardOwnerId(any());
         verify(context.cards).saveAll(argThat(imported -> {
@@ -114,27 +107,9 @@ class ImportControllerTest {
                 """;
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> context.controller.importBackup(
-                        backupFile(invalidCsv), 7L, "correct-password", false));
+                () -> context.service.importBackup(backupContents(invalidCsv), 7L, false));
 
         assertEquals(400, exception.getStatusCode().value());
-        verify(context.cards, never()).deleteByCardOwnerId(any());
-        verify(context.sets, never()).deleteByCardOwnerId(any());
-        verify(context.cards, never()).saveAll(any());
-        verify(context.sets, never()).saveAll(any());
-    }
-
-    @Test
-    void rejectsInvalidPasswordWithoutWritingData() {
-        TestContext context = new TestContext();
-        when(context.passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> context.controller.importBackup(
-                        backupFile(validCsv("Example Card", "1", "false")),
-                        7L, "incorrect-password", false));
-
-        assertEquals(401, exception.getStatusCode().value());
         verify(context.cards, never()).deleteByCardOwnerId(any());
         verify(context.sets, never()).deleteByCardOwnerId(any());
         verify(context.cards, never()).saveAll(any());
@@ -179,28 +154,19 @@ class ImportControllerTest {
                 """.formatted(cardName, cardCount, foil);
     }
 
-    private static MockMultipartFile backupFile(String contents) {
-        return new MockMultipartFile("file", "backup.csv", "text/csv",
-                contents.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    private static byte[] backupContents(String contents) {
+        return contents.getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     private static class TestContext {
         private final OwnedCardRepository cards = mock(OwnedCardRepository.class);
         private final UserSetInfoRepository sets = mock(UserSetInfoRepository.class);
-        private final UserRepository users = mock(UserRepository.class);
-        private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         private final DatabaseSetRepository databaseSets = mock(DatabaseSetRepository.class);
         private final DatabaseCardRepository databaseCards = mock(DatabaseCardRepository.class);
-        private final ImportController controller;
+        private final CollectionBackupImportService service;
 
         private TestContext() {
-            User user = new User();
-            user.setId(7L);
-            user.setPasswordHash("encoded-password");
-            when(users.findById(7L)).thenReturn(Optional.of(user));
-            when(passwordEncoder.matches("correct-password", "encoded-password")).thenReturn(true);
-            controller = new ImportController(
-                    cards, sets, users, passwordEncoder, databaseSets, databaseCards);
+            service = new CollectionBackupImportService(cards, sets, databaseSets, databaseCards);
         }
     }
 }
