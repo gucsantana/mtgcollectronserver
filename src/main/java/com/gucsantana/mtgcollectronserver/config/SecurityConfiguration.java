@@ -64,7 +64,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource(Environment environment) {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://d2br05wdxuiqkf.cloudfront.net"));
+        configuration.setAllowedOrigins(List.of("https://d2br05wdxuiqkf.cloudfront.net","https://mtgcollectron.com","https://www.mtgcollectron.com"));
         if (!environment.acceptsProfiles(Profiles.of("prod"))) {
             configuration.setAllowedOriginPatterns(List.of(
                     "http://localhost:[*]",
