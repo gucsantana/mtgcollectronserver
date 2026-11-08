@@ -29,12 +29,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.gucsantana.mtgcollectronserver.dto.ChangePasswordRequest;
+import com.gucsantana.mtgcollectronserver.dto.DeleteAccountRequest;
 import com.gucsantana.mtgcollectronserver.dto.LoginRequest;
 import com.gucsantana.mtgcollectronserver.dto.RegisterUserRequest;
 import com.gucsantana.mtgcollectronserver.models.User;
 import com.gucsantana.mtgcollectronserver.models.UserPreferences;
+import com.gucsantana.mtgcollectronserver.repos.OwnedCardRepository;
 import com.gucsantana.mtgcollectronserver.repos.UserRepository;
 import com.gucsantana.mtgcollectronserver.repos.UserPreferencesRepository;
+import com.gucsantana.mtgcollectronserver.repos.UserSetInfoRepository;
 
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -45,6 +49,8 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final UserPreferencesRepository userPreferencesRepository;
+    private final OwnedCardRepository ownedCardRepository;
+    private final UserSetInfoRepository userSetInfoRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
@@ -55,11 +61,15 @@ public class AuthController {
             PasswordEncoder passwordEncoder,
             UserRepository userRepository,
             UserPreferencesRepository userPreferencesRepository,
+            OwnedCardRepository ownedCardRepository,
+            UserSetInfoRepository userSetInfoRepository,
             AuthenticationManager authenticationManager,
             SecurityContextRepository securityContextRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.userPreferencesRepository = userPreferencesRepository;
+        this.ownedCardRepository = ownedCardRepository;
+        this.userSetInfoRepository = userSetInfoRepository;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
     }
@@ -112,6 +122,48 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/change-password")
+    @Operation(summary = "Changes a user's password after verifying the current password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        User user = findUserForPasswordOperation(request.userId(), request.currentPassword());
+        user.setPasswordHash(passwordEncoder.encode(request.desiredPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/delete-account")
+    @Transactional
+    @CacheEvict(value = {
+            "user-cache",
+            "user-preferences-cache",
+            "owned-card-cache",
+            "user-set-info-cache"
+    }, allEntries = true)
+    @Operation(summary = "Deletes a user's account and all associated data")
+    public ResponseEntity<Void> deleteAccount(
+            @Valid @RequestBody DeleteAccountRequest request,
+            HttpServletRequest httpRequest) {
+        User user = findUserForPasswordOperation(request.userId(), request.password());
+
+        ownedCardRepository.deleteByCardOwnerId(user.getId());
+        userSetInfoRepository.deleteByCardOwnerId(user.getId());
+        userPreferencesRepository.deleteById(user.getId());
+        userRepository.delete(user);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && user.getUsername().equals(authentication.getName())) {
+            SecurityContextHolder.clearContext();
+            HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+        }
+
+        LOGGER.info("Deleted account for user {}", user.getId());
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/session")
     public ResponseEntity<SessionResponse> checkValidSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -127,6 +179,15 @@ public class AuthController {
         return ResponseEntity.ok(new SessionResponse(true, user.getId(), authentication.getName()));
     }
 
+    private User findUserForPasswordOperation(Long userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found with ID: " + userId));
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
+        }
+        return user;
+    }
 
     @PostMapping("/register")
     @Operation(summary = "Creates a user account by passing valid username, password and email fields")
